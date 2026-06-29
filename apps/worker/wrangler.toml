@@ -5,8 +5,8 @@ compatibility_flags = ["nodejs_compat"]
 
 [[kv_namespaces]]
 binding = "KV"
-id = "00000000000000000000000000000001"
-preview_id = "00000000000000000000000000000001"
+id = "0ea2bc1cbb594d0baa00b5dc05039a90"
+preview_id = "b03f18b10c7c41269d6a87b9593f59d0"
 
 [triggers]
 crons = [
