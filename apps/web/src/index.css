@@ -1,0 +1,73 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap");
+
+/* ── Design tokens ───────────────────────────────────────────────────────── */
+:root {
+  --surface-0: #ffffff;
+  --surface-1: #f7f7f8;
+  --surface-2: #efefef;
+  --ink: #0f0f10;
+  --ink-muted: #6b7280;
+  --ink-faint: #9ca3af;
+  --accent: #6366f1;
+  --accent-muted: rgba(99, 102, 241, 0.12);
+  --border: #e5e7eb;
+  color-scheme: light;
+}
+
+.dark {
+  --surface-0: #0d0e11;
+  --surface-1: #141519;
+  --surface-2: #1e1f25;
+  --ink: #f3f4f6;
+  --ink-muted: #9ca3af;
+  --ink-faint: #6b7280;
+  --accent: #818cf8;
+  --accent-muted: rgba(129, 140, 248, 0.12);
+  --border: #262730;
+  color-scheme: dark;
+}
+
+/* ── Base reset ──────────────────────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  background: var(--surface-0);
+  color: var(--ink);
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+#root {
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 99px;
+}

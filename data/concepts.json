@@ -1,0 +1,231 @@
+[
+  {
+    "id": "consistent-hashing",
+    "name": "Consistent Hashing",
+    "category": "Distributed Systems",
+    "simpleExplanation": "A technique for distributing data across servers so that when you add or remove a server, only a minimal fraction of keys need to move.",
+    "advancedExplanation": "Map both servers and keys onto a circular ring using the same hash function. Each key is owned by the first server clockwise from it on the ring. Adding a server only moves the keys between it and the previous server — O(K/N) keys rather than O(K). Virtual nodes (vnodes) improve balance by giving each server multiple positions on the ring.",
+    "realWorldUsage": ["Amazon DynamoDB partitioning", "Cassandra token ring", "Memcached and consistent hashing clients", "CDN edge node selection"],
+    "interviewQuestions": ["Why is consistent hashing better than modulo hashing for distributed systems?", "What problem do virtual nodes solve in consistent hashing?", "How does adding a node affect key distribution in consistent hashing?"],
+    "commonMistakes": ["Forgetting that without vnodes, distribution is uneven", "Not accounting for replication factor in the ring traversal", "Confusing consistent hashing with rendezvous hashing"],
+    "relatedConcepts": ["data-partitioning", "load-balancing", "cap-theorem"],
+    "companiesUsing": ["Amazon", "Apache Cassandra team", "Discord", "Cloudflare"],
+    "resources": [
+      { "title": "Consistent Hashing and Random Trees (Karger et al.)", "url": "https://dl.acm.org/doi/10.1145/258533.258660", "type": "article" },
+      { "title": "System Design: Consistent Hashing", "url": "https://www.youtube.com/watch?v=zaRkONvyGr8", "type": "video" }
+    ]
+  },
+  {
+    "id": "cap-theorem",
+    "name": "CAP Theorem",
+    "category": "Distributed Systems",
+    "simpleExplanation": "A distributed system can only guarantee two of three properties at once: Consistency (every read gets the latest write), Availability (every request gets a response), and Partition tolerance (system works despite network splits).",
+    "advancedExplanation": "Brewer's theorem (2000), proved formally by Gilbert & Lynch (2002). In practice, network partitions are unavoidable, so the real choice is CP vs AP. CP systems (Zookeeper, HBase) return an error when partitioned. AP systems (Cassandra, DynamoDB) return potentially stale data. PACELC extends CAP to also model latency vs consistency tradeoffs during normal operation.",
+    "realWorldUsage": ["Cassandra is AP: eventual consistency for high availability", "Zookeeper is CP: linearizable operations used for leader election", "DynamoDB lets you choose per-table", "PostgreSQL is CA: not partition-tolerant in single-node mode"],
+    "interviewQuestions": ["Can you give an example of a CP system and explain why?", "Why is partition tolerance not really optional in a distributed system?", "What is PACELC and how does it extend CAP?"],
+    "commonMistakes": ["Thinking you can choose all three", "Applying CAP to single-node databases", "Confusing consistency in CAP with consistency in ACID"],
+    "relatedConcepts": ["eventual-consistency", "linearizability", "raft-consensus", "distributed-systems"],
+    "companiesUsing": ["Amazon (DynamoDB)", "Apache (Cassandra, Zookeeper)", "Google (Spanner)"],
+    "resources": [
+      { "title": "Brewer's Conjecture (Gilbert & Lynch)", "url": "https://dl.acm.org/doi/10.1145/564585.564601", "type": "article" },
+      { "title": "Please stop calling databases CP or AP", "url": "https://martin.kleppmann.com/2015/05/11/please-stop-calling-databases-cp-or-ap.html", "type": "article" }
+    ]
+  },
+  {
+    "id": "raft-consensus",
+    "name": "Raft Consensus Algorithm",
+    "category": "Distributed Systems",
+    "simpleExplanation": "A protocol that lets a cluster of servers agree on a sequence of values (a replicated log) even if some servers crash, as long as a majority remain alive.",
+    "advancedExplanation": "Raft decomposes consensus into leader election, log replication, and safety. One server is elected leader and exclusively handles writes — it replicates entries to followers, commits when a quorum acknowledges. Leader terms prevent split-brain. Log entries are committed only when a majority has them. Simpler than Paxos; designed to be understandable.",
+    "realWorldUsage": ["etcd (Kubernetes config store)", "CockroachDB replication", "TiKV", "Consul", "InfluxDB"],
+    "interviewQuestions": ["What happens when a Raft leader fails?", "How does Raft guarantee that a committed log entry is never lost?", "What is the difference between Raft and Paxos?"],
+    "commonMistakes": ["Thinking Raft is faster than Paxos (it isn't, it's just simpler)", "Forgetting that reads also need quorum for linearizability", "Underestimating the importance of log compaction (snapshotting)"],
+    "relatedConcepts": ["paxos", "leader-election", "distributed-log", "cap-theorem"],
+    "companiesUsing": ["HashiCorp (Consul)", "CockroachDB", "TiDB", "Kubernetes (etcd)"],
+    "resources": [
+      { "title": "In Search of an Understandable Consensus Algorithm (Ongaro & Ousterhout)", "url": "https://raft.github.io/raft.pdf", "type": "article" },
+      { "title": "The Raft paper visualized", "url": "https://raft.github.io", "type": "article" }
+    ]
+  },
+  {
+    "id": "bloom-filter",
+    "name": "Bloom Filter",
+    "category": "Databases",
+    "simpleExplanation": "A space-efficient data structure that can tell you definitively when something is NOT in a set, and probabilistically (with a small false positive rate) when it IS in the set.",
+    "advancedExplanation": "A bit array of m bits plus k hash functions. To add: hash the element k times, set those bits to 1. To query: hash the element, return false if any bit is 0 (definitive miss), true if all bits are 1 (probable hit). False positive rate: (1 - e^(-kn/m))^k where n is insertions. No deletions without Counting Bloom Filters. Space is O(n) independent of element size.",
+    "realWorldUsage": ["Cassandra: skip SSTables that don't contain a key", "Chrome: Safe Browsing API — check URLs without sending every URL to Google", "HBase block cache lookups", "CDNs: avoid caching one-hit wonders"],
+    "interviewQuestions": ["Why can't a Bloom filter have false negatives?", "How do you choose the optimal k (number of hash functions)?", "What is a Counting Bloom Filter and when would you use it?"],
+    "commonMistakes": ["Using it when you need exact membership", "Not accounting for false positive rate growing as more elements are added", "Forgetting you can't delete elements from a standard Bloom filter"],
+    "relatedConcepts": ["lsm-tree", "probabilistic-data-structures", "caching", "hashing"],
+    "companiesUsing": ["Apache Cassandra", "HBase", "Google Chrome", "PostgreSQL (pg_partman)"],
+    "resources": [
+      { "title": "Bloom Filters by Example", "url": "https://llimllib.github.io/bloomfilter-tutorial/", "type": "article" }
+    ]
+  },
+  {
+    "id": "lsm-tree",
+    "name": "Log-Structured Merge Tree (LSM Tree)",
+    "category": "Databases",
+    "simpleExplanation": "A write-optimized data structure that buffers writes in memory and periodically flushes them to sorted disk files, which are later merged — achieving fast writes at the cost of slower reads.",
+    "advancedExplanation": "Writes go to an in-memory MemTable (sorted). When full, it's flushed to an immutable SSTable (Sorted String Table) on disk. SSTables are organized in levels. Compaction merges SSTables within and between levels, removing deleted keys (tombstones) and producing sorted output. Bloom filters on each SSTable avoid reading files that don't contain the key. Write amplification is a concern — each key may be rewritten multiple times during compaction.",
+    "realWorldUsage": ["LevelDB / RocksDB (used by CockroachDB, TiKV, Kafka)", "Apache Cassandra", "HBase", "ScyllaDB", "ClickHouse parts storage"],
+    "interviewQuestions": ["Why are LSM Trees write-optimized compared to B-Trees?", "What is write amplification and how does compaction strategy affect it?", "How do Bloom filters help LSM Tree read performance?"],
+    "commonMistakes": ["Assuming reads are fast — point reads can check many SSTables", "Ignoring space amplification during compaction", "Conflating compaction strategies (leveled vs. tiered vs. FIFO)"],
+    "relatedConcepts": ["bloom-filter", "b-tree", "rocksdb", "compaction"],
+    "companiesUsing": ["Facebook (RocksDB)", "Apache Cassandra", "Google Bigtable", "ClickHouse"],
+    "resources": [
+      { "title": "The Log-Structured Merge-Tree (O'Neil et al.)", "url": "https://www.cs.umb.edu/~poneil/lsmtree.pdf", "type": "article" }
+    ]
+  },
+  {
+    "id": "event-sourcing",
+    "name": "Event Sourcing",
+    "category": "Distributed Systems",
+    "simpleExplanation": "Instead of storing just the current state of data, you store the sequence of events that led to that state. The current state is derived by replaying all events from the beginning.",
+    "advancedExplanation": "Append-only event log is the system of record. State is a projection (fold) over events. This enables complete audit history, temporal queries ('what was the state on Tuesday?'), event replay for debugging, and multiple projections of the same event stream into different read models (CQRS). Snapshots periodically checkpoint state to avoid full replay. Works well with Kafka as the event store.",
+    "realWorldUsage": ["Banking transaction ledgers", "Git (each commit is an event)", "Shopify order management", "Event-driven microservices with Kafka"],
+    "interviewQuestions": ["What is the difference between event sourcing and audit logging?", "How do you handle schema evolution when event types change?", "When would you NOT use event sourcing?"],
+    "commonMistakes": ["Confusing event sourcing with event-driven architecture (different things)", "Not planning for schema evolution of events", "Making events too fine-grained, which makes projection performance poor"],
+    "relatedConcepts": ["cqrs", "saga-pattern", "apache-kafka", "domain-driven-design"],
+    "companiesUsing": ["Shopify", "Axon Framework users", "LinkedIn (Kafka-backed systems)"],
+    "resources": [
+      { "title": "Event Sourcing (Martin Fowler)", "url": "https://martinfowler.com/eaaDev/EventSourcing.html", "type": "article" }
+    ]
+  },
+  {
+    "id": "rate-limiting",
+    "name": "Rate Limiting",
+    "category": "Engineering",
+    "simpleExplanation": "Controlling how many requests a user or service can make in a given time window to protect system resources and ensure fair usage.",
+    "advancedExplanation": "Key algorithms: Token Bucket (tokens added at fixed rate; request consumes a token; allows bursting up to bucket capacity). Leaky Bucket (requests enter queue; processed at fixed rate; prevents bursting). Fixed Window Counter (simple but allows 2x rate at window boundaries). Sliding Window Log (precise but memory-intensive). Sliding Window Counter (approximation using two windows). In distributed systems, rate limiters need a shared store (Redis) or use approximate algorithms that work without coordination (e.g., cell rate algorithm).",
+    "realWorldUsage": ["Stripe API: per-key rate limits using token bucket", "Cloudflare WAF: IP-based rate limiting at the edge", "GitHub API: fixed window per hour", "Twitter API: 15-minute sliding windows"],
+    "interviewQuestions": ["Implement a rate limiter that handles 1000 requests per second per user.", "What are the tradeoffs between a token bucket and a leaky bucket?", "How would you build a distributed rate limiter with Redis?"],
+    "commonMistakes": ["Using fixed windows which allow double the rate at boundaries", "Not considering the thundering herd when limits reset simultaneously", "Building per-server rate limits instead of global ones"],
+    "relatedConcepts": ["circuit-breaker", "backpressure", "redis", "api-gateway"],
+    "companiesUsing": ["Stripe", "GitHub", "Twitter/X", "Cloudflare", "Shopify"],
+    "resources": [
+      { "title": "An alternative approach to rate limiting (Figma)", "url": "https://www.figma.com/blog/an-alternative-approach-to-rate-limiting/", "type": "article" }
+    ]
+  },
+  {
+    "id": "circuit-breaker",
+    "name": "Circuit Breaker Pattern",
+    "category": "Distributed Systems",
+    "simpleExplanation": "A safety mechanism that stops calling a failing service, allowing it to recover, rather than letting failures cascade through the system.",
+    "advancedExplanation": "Three states: Closed (normal operation, failures counted), Open (all calls fail fast without calling downstream), Half-Open (probe calls allowed — if successful, transitions to Closed; if failing, back to Open). Thresholds are configurable: error rate %, minimum call volume, and timeout duration. Prevents cascading failures and gives overloaded services time to recover. Netflix Hystrix popularized this pattern; Resilience4j is the modern alternative.",
+    "realWorldUsage": ["Netflix Hystrix: per-service circuit breakers in the API gateway", "Stripe: circuit breakers on payment processor integrations", "AWS SDK: exponential backoff + circuit breaker for AWS service calls"],
+    "interviewQuestions": ["What's the difference between a circuit breaker and a retry with backoff?", "When should you open a circuit breaker (what thresholds)?", "How do you test a circuit breaker in production?"],
+    "commonMistakes": ["Setting thresholds too sensitive (circuit trips on normal error spikes)", "Not implementing fallback behavior when circuit is open", "Having circuit breakers on both caller and callee (double protection, confusing state)"],
+    "relatedConcepts": ["rate-limiting", "bulkhead-pattern", "chaos-engineering", "microservices"],
+    "companiesUsing": ["Netflix", "Amazon", "Microsoft (Polly library)"],
+    "resources": [
+      { "title": "Circuit Breaker (Martin Fowler)", "url": "https://martinfowler.com/bliki/CircuitBreaker.html", "type": "article" }
+    ]
+  },
+  {
+    "id": "vector-database",
+    "name": "Vector Databases",
+    "category": "Databases",
+    "simpleExplanation": "Databases designed to store and search high-dimensional vectors (embeddings) — the numerical representations that AI models use to understand text, images, and other data.",
+    "advancedExplanation": "Store dense vectors (e.g., 1536 dimensions from OpenAI embeddings). Queries find the k nearest neighbors by similarity (cosine, dot product, Euclidean). Exact nearest neighbor search is O(n·d) — too slow at scale. Approximate Nearest Neighbor (ANN) algorithms trade recall for speed: HNSW (hierarchical navigable small world graphs), IVF (inverted file index with Voronoi cells), PQ (product quantization for compression). HNSW achieves ~95% recall at orders of magnitude faster than brute force.",
+    "realWorldUsage": ["RAG (Retrieval Augmented Generation) pipelines", "Semantic search", "Recommendation systems", "Image similarity search", "Duplicate content detection"],
+    "interviewQuestions": ["How does HNSW work and why is it fast?", "What is the tradeoff between recall and latency in ANN search?", "When would you use a vector database vs. adding a vector extension to Postgres?"],
+    "commonMistakes": ["Using cosine similarity when dot product (with normalized vectors) is faster and equivalent", "Not filtering by metadata before vector search (pre-filter vs. post-filter matters)", "Storing raw vectors without product quantization at large scale"],
+    "relatedConcepts": ["embeddings", "semantic-search", "rag", "approximate-nearest-neighbor"],
+    "companiesUsing": ["Pinecone", "Weaviate", "Chroma", "Qdrant", "pgvector (Postgres extension)"],
+    "resources": [
+      { "title": "HNSW: Efficient and Robust ANN Search", "url": "https://arxiv.org/abs/1603.09320", "type": "article" }
+    ]
+  },
+  {
+    "id": "cqrs",
+    "name": "CQRS (Command Query Responsibility Segregation)",
+    "category": "Distributed Systems",
+    "simpleExplanation": "Separate the data model you use for writing (commands) from the model you use for reading (queries). This lets each side be optimized independently.",
+    "advancedExplanation": "Commands mutate state and are routed to the write model (normalized relational DB, event store). Queries read from the read model (denormalized, materialized views, Elasticsearch). Read models are eventually consistent with the write model — updated asynchronously via events or projections. Particularly powerful when combined with Event Sourcing: events update multiple read models optimized for different access patterns.",
+    "realWorldUsage": ["E-commerce order systems (orders written to DB, product pages served from denormalized cache)", "Social feeds (writes to a graph store, reads from pre-computed materialized views)", "Banking (transactions written to ledger, account balances computed as projections)"],
+    "interviewQuestions": ["What problem does CQRS solve that a single model can't?", "How do you handle eventual consistency in the read model?", "When would you NOT use CQRS?"],
+    "commonMistakes": ["Applying CQRS to simple CRUD apps where it adds complexity without benefit", "Not thinking through eventual consistency and its impact on UX", "Creating too many separate read models that are expensive to maintain"],
+    "relatedConcepts": ["event-sourcing", "eventual-consistency", "materialized-views", "domain-driven-design"],
+    "companiesUsing": ["Microsoft (Azure event sourcing patterns)", "Axon Framework ecosystem"],
+    "resources": [
+      { "title": "CQRS (Martin Fowler)", "url": "https://martinfowler.com/bliki/CQRS.html", "type": "article" }
+    ]
+  },
+  {
+    "id": "service-mesh",
+    "name": "Service Mesh",
+    "category": "Distributed Systems",
+    "simpleExplanation": "A dedicated infrastructure layer that handles all service-to-service communication in a microservices architecture — including load balancing, retries, timeouts, and observability — without changing application code.",
+    "advancedExplanation": "A sidecar proxy (Envoy) runs alongside each service and intercepts all network traffic. The control plane (Istio, Linkerd) configures all proxies centrally. Features include mTLS (mutual TLS) for zero-trust service identity, traffic shifting for canary deployments, circuit breaking, distributed tracing, and metrics. eBPF-based meshes (Cilium) are emerging to reduce the overhead of sidecar proxies.",
+    "realWorldUsage": ["Google: originally built Istio internally (now Borg/GKE native)", "Airbnb: Istio for service-to-service auth", "Lyft: created Envoy proxy (now donated to CNCF)"],
+    "interviewQuestions": ["What is a sidecar proxy and why is it used in a service mesh?", "How does a service mesh enable zero-trust networking?", "What are the performance tradeoffs of adding a sidecar to every service?"],
+    "commonMistakes": ["Deploying a service mesh before you actually have a microservices problem", "Ignoring the operational complexity of running a control plane", "Not using mTLS when the mesh provides it for free"],
+    "relatedConcepts": ["envoy-proxy", "zero-trust", "microservices", "kubernetes", "circuit-breaker"],
+    "companiesUsing": ["Google", "Lyft (built Envoy)", "Airbnb", "GitHub"],
+    "resources": [
+      { "title": "The Service Mesh: What Every Software Engineer Needs to Know", "url": "https://buoyant.io/service-mesh-manifesto", "type": "article" }
+    ]
+  },
+  {
+    "id": "zero-trust",
+    "name": "Zero Trust Security",
+    "category": "Security",
+    "simpleExplanation": "A security model that assumes nothing inside or outside the network perimeter is trusted by default — every request must be authenticated and authorized, regardless of where it originates.",
+    "advancedExplanation": "Traditional perimeter security ('castle and moat') assumes everything inside the firewall is safe. Zero Trust replaces this with: verify every identity (device, user, service), enforce least privilege, assume breach and segment blast radius. Implemented via: identity-aware proxies (Cloudflare Access, Google BeyondCorp), mutual TLS for service-to-service, short-lived credentials, continuous device posture validation.",
+    "realWorldUsage": ["Google BeyondCorp: eliminated corporate VPN, all access through identity-aware proxy", "Cloudflare Access: ZTNA replacing VPNs for remote access", "GitHub: device trust and SAML SSO for enterprise"],
+    "interviewQuestions": ["What is the difference between Zero Trust and a VPN?", "How do you implement Zero Trust in a microservices architecture?", "What is mTLS and how does it provide service identity?"],
+    "commonMistakes": ["Thinking Zero Trust is a product you buy, not an architecture you design", "Implementing Zero Trust perimeter without addressing internal lateral movement", "Not combining Zero Trust with secrets management"],
+    "relatedConcepts": ["mtls", "service-mesh", "identity-aware-proxy", "principle-of-least-privilege"],
+    "companiesUsing": ["Google (BeyondCorp)", "Cloudflare (Access)", "Tailscale", "HashiCorp (Boundary)"],
+    "resources": [
+      { "title": "BeyondCorp: A New Approach to Enterprise Security", "url": "https://research.google/pubs/beyondcorp-a-new-approach-to-enterprise-security/", "type": "article" }
+    ]
+  },
+  {
+    "id": "chaos-engineering",
+    "name": "Chaos Engineering",
+    "category": "Engineering",
+    "simpleExplanation": "Intentionally injecting failures into a production system in a controlled way to find weaknesses before they cause real outages.",
+    "advancedExplanation": "Originated at Netflix with Chaos Monkey. Methodology: define steady state (normal system behavior metrics), hypothesize that steady state will hold under failure conditions, inject failures (kill instances, introduce latency, drop packets, saturate CPU), observe whether steady state is maintained. Key tools: Chaos Monkey (instance termination), Chaos Kong (region termination), Gremlin (managed chaos platform). Gamedays formalize this into team exercises.",
+    "realWorldUsage": ["Netflix: continuous automated chaos in production", "AWS: GameDay exercises before major launches", "LinkedIn: automated chaos testing in CI pipeline"],
+    "interviewQuestions": ["What is the difference between chaos engineering and load testing?", "How do you safely run chaos experiments in production?", "What metrics define 'steady state' for your system?"],
+    "commonMistakes": ["Running chaos experiments without a clear hypothesis or steady state defined", "Starting with production instead of staging environments", "Not having observability in place before injecting chaos"],
+    "relatedConcepts": ["circuit-breaker", "resilience", "observability", "gameday"],
+    "companiesUsing": ["Netflix", "Amazon", "LinkedIn", "Gremlin (product)"],
+    "resources": [
+      { "title": "Principles of Chaos Engineering", "url": "https://principlesofchaos.org", "type": "article" },
+      { "title": "Chaos Monkey (Netflix Tech Blog)", "url": "https://netflixtechblog.com/the-netflix-simian-army-16e57fbab116", "type": "article" }
+    ]
+  },
+  {
+    "id": "crdt",
+    "name": "CRDTs (Conflict-Free Replicated Data Types)",
+    "category": "Distributed Systems",
+    "simpleExplanation": "Data structures designed for distributed systems that can be updated independently on multiple nodes and always merged correctly without conflicts — enabling local-first, offline-capable apps.",
+    "advancedExplanation": "Two families: State-based CRDTs (CvRDT) — merge entire state, must be a join-semilattice. Operation-based CRDTs (CmRDT) — propagate operations, require reliable delivery. Common examples: G-Counter (grow-only counter), PN-Counter, LWW-Register (last-write-wins), OR-Set (observed-remove set), Sequence CRDTs (YATA, RGA for collaborative text). Used in Yjs, Automerge, and local-first software frameworks.",
+    "realWorldUsage": ["Figma: document collaboration", "Linear: real-time issue editing", "Notion: block-based collaborative editing", "Redis: CRDT-based geo-distributed mode (Enterprise)"],
+    "interviewQuestions": ["What makes a CRDT conflict-free?", "What is the difference between a G-Counter and a PN-Counter?", "When would you use a CRDT vs. Operational Transform?"],
+    "commonMistakes": ["Thinking CRDTs solve all concurrency problems — they don't handle intent conflicts", "Using LWW (last-write-wins) when it silently loses data", "Underestimating tombstone accumulation in OR-Sets"],
+    "relatedConcepts": ["eventual-consistency", "local-first-software", "vector-clock", "operational-transforms"],
+    "companiesUsing": ["Figma", "Linear", "Notion", "Redis Enterprise"],
+    "resources": [
+      { "title": "CRDTs: The Hard Parts (Martin Kleppmann)", "url": "https://www.youtube.com/watch?v=x7drE24geUw", "type": "video" }
+    ]
+  },
+  {
+    "id": "data-lakehouse",
+    "name": "Data Lakehouse",
+    "category": "Databases",
+    "simpleExplanation": "An architecture that combines the low-cost storage of a data lake with the data management and query performance features of a data warehouse — ACID transactions on files in object storage.",
+    "advancedExplanation": "Traditional data lakes store raw files (Parquet, ORC) on S3/GCS but lack ACID transactions, schema enforcement, and efficient updates. Data warehouses (Snowflake, Redshift) add these but are expensive. The Lakehouse (coined by Databricks) adds a metadata/transaction layer (Delta Lake, Apache Iceberg, Apache Hudi) on top of the raw file lake. Features: ACID transactions via optimistic concurrency control, time travel (read historical versions), Z-ordering for data skipping, schema evolution.",
+    "realWorldUsage": ["Databricks Delta Lake: default storage format", "Netflix: Iceberg for petabyte-scale tables", "Apple: Iceberg for internal analytics", "LinkedIn: Apache Hudi for streaming upserts"],
+    "interviewQuestions": ["What problem does Apache Iceberg solve that Parquet files in S3 don't?", "How does Delta Lake implement ACID transactions on object storage?", "What is Z-ordering and how does it improve query performance?"],
+    "commonMistakes": ["Confusing the file format (Parquet) with the table format (Iceberg, Delta Lake)", "Not compacting small files which degrades query performance", "Ignoring time travel cost — historical versions accumulate storage"],
+    "relatedConcepts": ["apache-spark", "parquet", "object-storage", "data-warehouse", "apache-iceberg"],
+    "companiesUsing": ["Databricks", "Netflix", "Apple", "LinkedIn", "Shopify"],
+    "resources": [
+      { "title": "Lakehouse: A New Generation of Open Platforms", "url": "https://www.cidrdb.org/cidr2021/papers/cidr2021_paper17.pdf", "type": "article" }
+    ]
+  }
+]

@@ -1,0 +1,19 @@
+{
+  "name": "@engineer-daily/worker",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev src/index.ts",
+    "build": "wrangler deploy --dry-run",
+    "deploy": "wrangler deploy src/index.ts"
+  },
+  "dependencies": {
+    "fast-xml-parser": "^4.5.3"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250620.0",
+    "typescript": "~5.8.3",
+    "wrangler": "^4.20.5"
+  }
+}

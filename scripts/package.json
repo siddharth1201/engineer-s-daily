@@ -1,0 +1,20 @@
+{
+  "name": "engineer-daily-scripts",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "next-concepts": "tsx next-concepts.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.1",
+    "typescript": "~5.8.3"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
+  }
+}

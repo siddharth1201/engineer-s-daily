@@ -1,0 +1,22 @@
+name = "engineer-daily-worker"
+main = "src/index.ts"
+compatibility_date = "2025-06-01"
+compatibility_flags = ["nodejs_compat"]
+
+[[kv_namespaces]]
+binding = "KV"
+id = "00000000000000000000000000000001"
+preview_id = "00000000000000000000000000000001"
+
+[triggers]
+crons = [
+  "0 * * * *",
+  "30 5 * * *"
+]
+
+[vars]
+ENVIRONMENT = "production"
+
+[dev]
+port = 8788
+

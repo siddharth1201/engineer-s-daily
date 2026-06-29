@@ -1,0 +1,86 @@
+[
+  {
+    "id": "sd-url-shortener",
+    "question": "Design a URL shortener like bit.ly. It needs to handle 100 million URLs shortened per day and 10 billion redirects per day.",
+    "type": "system-design",
+    "difficulty": "medium",
+    "hint": "Think about read-heavy vs write-heavy characteristics and what that implies for your storage choice and caching strategy. Consider ID generation — how do you create short, unique, non-sequential codes at high throughput?"
+  },
+  {
+    "id": "sd-rate-limiter",
+    "question": "Design a rate limiter that can enforce per-user, per-API-key, and per-IP limits across a distributed system with thousands of nodes.",
+    "type": "system-design",
+    "difficulty": "medium",
+    "hint": "Consider sliding window vs token bucket. Where does state live — in-process (fast but not global) or Redis (global but adds latency)? What happens when Redis is slow or unavailable?"
+  },
+  {
+    "id": "sd-news-feed",
+    "question": "Design a social media news feed (like Twitter/X). Users follow other users. When a user opens the app, they should see the latest posts from who they follow, in reverse chronological order.",
+    "type": "system-design",
+    "difficulty": "hard",
+    "hint": "The core tradeoff: fan-out on write (push to all followers' feeds on post) vs fan-out on read (pull and merge on open). What about celebrities with 50M followers? How does Twitter actually solve this?"
+  },
+  {
+    "id": "lc-find-median-stream",
+    "question": "Find the Median from a Data Stream. Design a data structure that supports adding numbers and finding the median at any point. Target O(log n) insert and O(1) find-median.",
+    "type": "leetcode",
+    "difficulty": "hard",
+    "hint": "Think about maintaining two heaps — one max-heap for the lower half, one min-heap for the upper half. The median is always at the tops of these heaps."
+  },
+  {
+    "id": "ds-split-brain",
+    "question": "In a distributed database with 5 nodes, a network partition splits the cluster into groups of 3 and 2. Both partitions continue accepting writes. When the partition heals, how do you reconcile the diverged state?",
+    "type": "distributed-systems",
+    "difficulty": "hard",
+    "hint": "This is the core of why quorum matters. How do systems like Cassandra handle this with vector clocks and last-write-wins? How does CockroachDB prevent it from happening in the first place?"
+  },
+  {
+    "id": "behavioral-system-down",
+    "question": "Tell me about a time a system you were responsible for went down in production. Walk through exactly what happened, how you detected it, how you communicated, and what you changed afterward.",
+    "type": "behavioral",
+    "difficulty": "medium",
+    "hint": "Interviewers want to see: clear incident timeline, how you stayed calm under pressure, cross-team communication, a genuine postmortem (not blame), and a concrete change you made to prevent recurrence."
+  },
+  {
+    "id": "debug-memory-leak",
+    "question": "Your Node.js service's memory grows 50MB every hour and never falls. GC isn't collecting it. Describe your debugging process, from first symptom to root cause identification.",
+    "type": "debugging",
+    "difficulty": "medium",
+    "hint": "Start with heap snapshots (Chrome DevTools / node --inspect). Compare two snapshots over time to find what's growing. Common causes: event listeners not removed, closures capturing large objects, caches with no eviction policy."
+  },
+  {
+    "id": "sd-distributed-cache",
+    "question": "Design a distributed cache (like Redis) that can handle 1 million requests per second with 99.9% availability. Discuss partitioning, replication, eviction policies, and failure scenarios.",
+    "type": "system-design",
+    "difficulty": "hard",
+    "hint": "How do you partition data (consistent hashing)? What's the replication strategy (primary-replica vs. multi-primary)? What happens when a primary fails? Consider LRU, LFU, and TTL-based eviction and their tradeoffs."
+  },
+  {
+    "id": "lc-lru-cache",
+    "question": "Implement an LRU (Least Recently Used) Cache with O(1) get and O(1) put operations.",
+    "type": "leetcode",
+    "difficulty": "medium",
+    "hint": "You need O(1) lookup AND O(1) reordering by recency. A HashMap alone gives O(1) lookup but O(n) reordering. A doubly-linked list gives O(1) reordering if you have a pointer to the node. What data structure combines both?"
+  },
+  {
+    "id": "sd-notification-system",
+    "question": "Design a notification system that sends 10 billion notifications per day across email, push, and SMS. Users can configure quiet hours. Some notifications are time-sensitive (OTP codes), others are not.",
+    "type": "system-design",
+    "difficulty": "medium",
+    "hint": "This is a fan-out problem at massive scale. Think about priority queues (time-sensitive vs. batched), provider abstractions (multiple email providers for reliability), delivery receipts, and rate limiting per user and per channel."
+  },
+  {
+    "id": "ds-two-generals",
+    "question": "Explain the Two Generals Problem. Why is it fundamental to distributed systems? What does it tell us about the limits of TCP and exactly-once delivery?",
+    "type": "distributed-systems",
+    "difficulty": "hard",
+    "hint": "The Two Generals Problem proves that no protocol can guarantee agreement over an unreliable channel. TCP can guarantee delivery but not that both parties know the connection closed cleanly. What does this mean for 'exactly-once' message delivery?"
+  },
+  {
+    "id": "behavioral-disagree",
+    "question": "Describe a situation where you disagreed with a technical decision made by your team or manager. What was the decision, why did you disagree, what did you do about it, and what was the outcome?",
+    "type": "behavioral",
+    "difficulty": "medium",
+    "hint": "Good answers show: you made your case clearly with data, you knew when to disagree and commit, and you didn't let it become personal. Avoid stories where you just gave in — or where you were needlessly stubborn."
+  }
+]
